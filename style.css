@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to bottom right, #1b0c28, #222c44);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #ffffff;
+}
+
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.voicebot-ui {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 40px;
+  padding: 40px 50px;
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 0 30px rgba(189, 111, 255, 0.3);
+}
+
+.logo-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.voicebot-logo {
+  width: 40px;
+  height: 40px;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #e07fff;
+  text-shadow: 0 0 10px #d85fff;
+  margin: 0;
+}
+
+.bot-response {
+  font-size: 1rem;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-bottom: 30px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(221, 160, 255, 0.08);
+  border: 1px solid rgba(221, 160, 255, 0.1);
+  color: #f2eaff;
+  text-align: left;
+  box-shadow: inset 0 0 4px rgba(221,160,255,0.1);
+  scroll-behavior: smooth;
+}
+
+.round-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.round-buttons button {
+  background-color: #d178ff;
+  color: #140021;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px #d178ff;
+  transition: all 0.3s ease;
+}
+
+.round-buttons button:hover {
+  background-color: #be67e7;
+  box-shadow: 0 0 25px #d178ff;
+}
+
+/* 🟢 Green Pulse for Listening */
+#startBtn.listening {
+  animation: pulse 1.2s infinite;
+  background-color: #3effc3;
+  color: #000;
+  box-shadow: 0 0 25px #3effc3;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px #3effc3;
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #3effc3;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px #3effc3;
+  }
+}
+
+.bot-response::-webkit-scrollbar {
+  width: 8px;
+}
+.bot-response::-webkit-scrollbar-thumb {
+  background-color: #d178ff;
+  border-radius: 4px;
+}
+.bot-response::-webkit-scrollbar-track {
+  background: transparent;
+}

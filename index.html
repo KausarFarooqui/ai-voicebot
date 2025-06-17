@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI VoiceBot</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="center-container">
+    <div class="voicebot-ui">
+      <div class="logo-title">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712105.png" alt="voicebot" class="voicebot-logo" />
+        <h1>AI VoiceBot</h1>
+      </div>
+
+      <div class="bot-response" id="botResponse">...</div>
+
+      <div class="round-buttons">
+        <button id="startBtn" onclick="startListening()">Start</button>
+        <button onclick="stopSpeaking()">Stop</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
