@@ -81,7 +81,7 @@ function speakWithEffect(text) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = speechLang;
   utterance.pitch = 1.1;
-  utterance.rate = 0.8; // Slower speech rate to match typing
+  utterance.rate = 1; // Slightly faster speech for better pacing
 
   typingInterval = setInterval(() => {
     if (index < text.length) {
@@ -91,7 +91,7 @@ function speakWithEffect(text) {
       clearInterval(typingInterval);
       typingInterval = null;
     }
-  }, 60); // Slightly slower to sync with speaking
+  }, 50); // Matched to new speech rate
 
   speechSynthesis.speak(utterance);
 }
