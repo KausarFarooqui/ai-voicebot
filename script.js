@@ -1,4 +1,6 @@
 let typingInterval = null;
+let recognitionLang = 'en-US';
+let speechLang = 'en-US';
 
 const qaTrainingSet = [
   {
@@ -15,31 +17,29 @@ const qaTrainingSet = [
   }
 ];
 
-function getMatchedAnswer(userInput) {
-  const query = userInput.toLowerCase();
-  for (const item of qaTrainingSet) {
-    if (item.tags.some(tag => query.includes(tag))) {
-      return item.answer;
-    }
-  }
-  return null;
-}
-
 function startListening() {
   const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
   const startBtn = document.getElementById("startBtn");
-  recognition.lang = "en-US";
+  recognition.lang = recognitionLang;
   recognition.start();
 
   startBtn.classList.add("listening");
 
   recognition.onresult = function (event) {
     const transcript = event.results[0][0].transcript;
-    getBotResponse(transcript);
-    startBtn.classList.remove("listening");
+
+    // 👤 Show in "You asked" container
+    document.getElementById("userText").innerHTML = `You asked: <em>${transcript}</em>`;
+
+    // 💬 Add user message to chat
+    createMessage('user', transcript);
+
+    handleCommand(transcript);
   };
 
-  recognition.onend = function () {
+  recognition.onspeechend = () => recognition.stop();
+
+  recognition.onend = () => {
     startBtn.classList.remove("listening");
   };
 
@@ -53,35 +53,53 @@ function stopSpeaking() {
   speechSynthesis.cancel();
   document.getElementById("startBtn").classList.remove("listening");
 
-  // Stop typing
   if (typingInterval) {
     clearInterval(typingInterval);
     typingInterval = null;
   }
 }
 
+function createMessage(type, text) {
+  const container = document.getElementById("chatContainer");
+  const div = document.createElement("div");
+  div.className = type === 'user' ? 'user-msg' : 'bot-msg';
+  div.innerText = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
 function speakWithEffect(text) {
-  const display = document.getElementById("botResponse");
-  display.innerHTML = "";
+  const botBubble = createMessage('bot', '');
   let index = 0;
 
   if (typingInterval) clearInterval(typingInterval);
 
   typingInterval = setInterval(() => {
     if (index < text.length) {
-      display.innerHTML += text.charAt(index);
+      botBubble.textContent += text.charAt(index); // ✅ FIXED spacing with .textContent
       index++;
     } else {
       clearInterval(typingInterval);
       typingInterval = null;
     }
-  }, 30);
+  }, 40); // ✅ smoother speed for readability
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
+  utterance.lang = speechLang;
   utterance.pitch = 1.1;
   utterance.rate = 1;
   speechSynthesis.speak(utterance);
+}
+
+function getMatchedAnswer(userInput) {
+  const query = userInput.toLowerCase();
+  for (const item of qaTrainingSet) {
+    if (item.tags.some(tag => query.includes(tag))) {
+      return item.answer;
+    }
+  }
+  return null;
 }
 
 function getBotResponse(userInput) {
@@ -105,11 +123,46 @@ function getBotResponse(userInput) {
   )
     .then(res => res.json())
     .then(data => {
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't answer that.";
+      const reply =
+        data?.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't answer that.";
       speakWithEffect(reply);
     })
     .catch(err => {
       console.error(err);
       speakWithEffect("Something went wrong. Please try again.");
     });
+}
+
+function handleCommand(transcript) {
+  const lc = transcript.toLowerCase();
+
+  if (lc.includes("switch to hindi")) {
+    recognitionLang = 'hi-IN';
+    speechLang = 'hi-IN';
+    speakWithEffect("भाषा अब हिंदी में बदल गई है।");
+    return;
+  }
+
+  if (lc.includes("switch to spanish")) {
+    recognitionLang = 'es-ES';
+    speechLang = 'es-ES';
+    speakWithEffect("El idioma se ha cambiado al español.");
+    return;
+  }
+
+  if (lc.includes("switch to french")) {
+    recognitionLang = 'fr-FR';
+    speechLang = 'fr-FR';
+    speakWithEffect("La langue a été changée en français.");
+    return;
+  }
+
+  if (lc.includes("switch to english")) {
+    recognitionLang = 'en-US';
+    speechLang = 'en-US';
+    speakWithEffect("Language switched to English.");
+    return;
+  }
+
+  getBotResponse(transcript);
 }
