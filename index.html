@@ -5,41 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI VoiceBot</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="center-container">
-    <div class="voicebot-ui">
-      <div class="logo-title">
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712105.png" alt="voicebot" class="voicebot-logo" />
-        <h1>AI VoiceBot</h1>
+    <div class="voicebot-ui-wrapper">
+      <!-- 🎛️ Equalizer Bars Outside Container -->
+      <canvas id="leftBar" class="eq-bar external-bar left"></canvas>
+
+      <!-- 🧠 Main VoiceBot UI -->
+      <div class="voicebot-ui">
+        <!-- 🔊 Header -->
+        <div class="logo-title">
+          <img src="https://cdn-icons-png.flaticon.com/512/4712/4712105.png" alt="voicebot" class="voicebot-logo" />
+          <h1>AI VoiceBot</h1>
+        </div>
+
+        <!-- 🎤 Display what user asked -->
+        <div class="user-asked" id="userText">You asked: <em>...</em></div>
+
+        <!-- 💬 Chat area -->
+        <div id="chatContainer" class="chat-container"></div>
+
+        <!-- 🎙️ Controls -->
+        <div class="round-buttons-wrapper">
+          <div class="round-buttons">
+            <button id="startBtn" onclick="startListening()">🎙️ Start</button>
+            <div id="listeningLabel" class="listening-label">Listening...</div>
+          </div>
+          <div class="stop-button-wrapper">
+            <button id="stopBtn" onclick="stopSpeaking()">⏹ Stop</button>
+          </div>
+        </div>
       </div>
 
-      <!-- 👤 User Asked Area -->
-      <div class="user-asked" id="userText">You asked: <em>...</em></div>
-
-      <!-- 💬 Chat -->
-      <div id="chatContainer" class="chat-container"></div>
-
-      <!-- 🎤 Mic Start Button -->
-      <div class="round-buttons">
-        <button id="startBtn" onclick="startListening()">
-          🎙️ Start
-        </button>
-        <button onclick="stopSpeaking()">⏹ Stop</button>
-      </div>
+      <canvas id="rightBar" class="eq-bar external-bar right"></canvas>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="config.js"></script>
   <script src="script.js"></script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('PWA ready!'));
-    }
-  </script>
 </body>
 </html>

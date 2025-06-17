@@ -24,16 +24,12 @@ function startListening() {
   recognition.start();
 
   startBtn.classList.add("listening");
+  startWaveAnimation();
 
   recognition.onresult = function (event) {
     const transcript = event.results[0][0].transcript;
-
-    // 👤 Show in "You asked" container
     document.getElementById("userText").innerHTML = `You asked: <em>${transcript}</em>`;
-
-    // 💬 Add user message to chat
     createMessage('user', transcript);
-
     handleCommand(transcript);
   };
 
@@ -41,17 +37,20 @@ function startListening() {
 
   recognition.onend = () => {
     startBtn.classList.remove("listening");
+    stopWaveAnimation();
   };
 
   recognition.onerror = function () {
     alert("Speech recognition failed. Try again.");
     startBtn.classList.remove("listening");
+    stopWaveAnimation();
   };
 }
 
 function stopSpeaking() {
   speechSynthesis.cancel();
   document.getElementById("startBtn").classList.remove("listening");
+  stopWaveAnimation();
 
   if (typingInterval) {
     clearInterval(typingInterval);
@@ -77,13 +76,13 @@ function speakWithEffect(text) {
 
   typingInterval = setInterval(() => {
     if (index < text.length) {
-      botBubble.textContent += text.charAt(index); // ✅ FIXED spacing with .textContent
+      botBubble.textContent += text.charAt(index);
       index++;
     } else {
       clearInterval(typingInterval);
       typingInterval = null;
     }
-  }, 40); // ✅ smoother speed for readability
+  }, 40);
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = speechLang;
@@ -165,4 +164,82 @@ function handleCommand(transcript) {
   }
 
   getBotResponse(transcript);
+}
+
+let audioContext, analyser, microphone, animationId;
+
+function startWaveAnimation() {
+  const leftCanvas = document.getElementById("leftBar");
+  const rightCanvas = document.getElementById("rightBar");
+  const leftCtx = leftCanvas.getContext("2d");
+  const rightCtx = rightCanvas.getContext("2d");
+
+  function resizeBars() {
+    const container = document.querySelector(".voicebot-ui");
+    const height = container.clientHeight * 0.6;
+    leftCanvas.height = rightCanvas.height = height;
+    leftCanvas.width = rightCanvas.width = 16;
+  }
+
+  resizeBars();
+  window.addEventListener("resize", resizeBars);
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    microphone = audioContext.createMediaStreamSource(stream);
+    microphone.connect(analyser);
+    analyser.fftSize = 64;
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function getColor(val) {
+      if (val < 85) return "#00ff7f"; // green
+      if (val < 170) return "#ffa500"; // orange
+      return "#ff3b3b"; // red
+    }
+
+    function drawBar(ctx) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      const barWidth = ctx.canvas.width;
+      const barSpacing = 4;
+      const barCount = Math.floor(ctx.canvas.height / barSpacing);
+      const segmentSize = Math.floor(bufferLength / barCount);
+
+      for (let i = 0; i < barCount; i++) {
+        const val = dataArray[i * segmentSize] || 0;
+        const height = (val / 255) * barSpacing;
+        const y = ctx.canvas.height - i * barSpacing;
+
+        ctx.fillStyle = getColor(val);
+        ctx.fillRect(0, y, barWidth, height);
+      }
+    }
+
+    function animateBars() {
+      animationId = requestAnimationFrame(animateBars);
+      analyser.getByteFrequencyData(dataArray);
+      drawBar(leftCtx);
+      drawBar(rightCtx);
+    }
+
+    animateBars();
+  });
+}
+
+function stopWaveAnimation() {
+  if (animationId) cancelAnimationFrame(animationId);
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+  }
+  const leftCanvas = document.getElementById("leftBar");
+  const rightCanvas = document.getElementById("rightBar");
+  if (leftCanvas && rightCanvas) {
+    const leftCtx = leftCanvas.getContext("2d");
+    const rightCtx = rightCanvas.getContext("2d");
+    leftCtx.clearRect(0, 0, leftCanvas.width, leftCanvas.height);
+    rightCtx.clearRect(0, 0, rightCanvas.width, rightCanvas.height);
+  }
 }
