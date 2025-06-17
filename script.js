@@ -74,6 +74,11 @@ function speakWithEffect(text) {
 
   if (typingInterval) clearInterval(typingInterval);
 
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = speechLang;
+  utterance.pitch = 1.1;
+  utterance.rate = 0.8; // Slower speech rate to match typing
+
   typingInterval = setInterval(() => {
     if (index < text.length) {
       botBubble.textContent += text.charAt(index);
@@ -82,12 +87,8 @@ function speakWithEffect(text) {
       clearInterval(typingInterval);
       typingInterval = null;
     }
-  }, 40);
+  }, 60); // Slightly slower to sync with speaking
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = speechLang;
-  utterance.pitch = 1.1;
-  utterance.rate = 1;
   speechSynthesis.speak(utterance);
 }
 
@@ -108,7 +109,7 @@ function getBotResponse(userInput) {
     return;
   }
 
-  const prompt = `You are Kausar Farooqui, an AI/ML developer. Answer this clearly and smartly:\n\n"${userInput}"`;
+  const prompt = `You are Kausar.Ai, an AI/ML developer. Answer this clearly and smartly:\n\n"${userInput}"`;
 
   fetch(
     `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
