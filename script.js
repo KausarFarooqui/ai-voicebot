@@ -20,6 +20,10 @@ const qaTrainingSet = [
 function startListening() {
   const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
   const startBtn = document.getElementById("startBtn");
+  // Mobile speech fix: trigger once with empty utterance to unlock audio permission
+  const warmup = new SpeechSynthesisUtterance('');
+  window.speechSynthesis.speak(warmup);
+
   recognition.lang = recognitionLang;
   recognition.start();
 
